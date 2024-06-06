@@ -12,7 +12,7 @@ output: microanalyst_otu_table.txt and microanalyst_tax_table.txt
 
 How to use
 
-python kraken2micro.py --rank 'S' --organism 'Bacteria' --files MP1_A_mpa.txt MP1_B_mpa.txt	MP1_C_mpa.txt MP2_A_mpa.txt MP2_B_mpa.txt MP2_C_mpa.txt	MP3_A_mpa.txt MP3_B_mpa.txt MP3_C_mpa.txt MP4_A_mpa.txt MP4_B_mpa.txt MP4_C_mpa.txt MP5_A_mpa.txt MP5_B_mpa.txt MP5_C_mpa.txt
+python kraken2micro.py --rank 'S' --organism 'Bacteria' --files file1_mpa.txt file2_mpa.txt file2_mpa.txt
 """
 
 
