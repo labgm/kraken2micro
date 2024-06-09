@@ -10,5 +10,5 @@ python kraken2micro.py --rank 'S' --organism 'Bacteria' --files file1_mpa.txt fi
 
 --organism  Filter organisms that are not the one provided (default= 'Bacteria') (options = 'Bacteria', 'Viruses', 'Archaea', 'Eukaryota')
 
---files list of kraken2 mpa files
+--files list of kraken2 mpa files (Must be with '.txt' extension)
 
