@@ -8,7 +8,7 @@ python kraken2micro.py --rank 'S' --organism 'Bacteria' --files file1_mpa.txt fi
 ## Parameters
 --rank   Last rank for tables construction (default= 'S') (options = 'S', 'G', 'F', 'O', 'C', 'P', 'K')
 
---organism  Filter organisms that are not the one provided (default= 'Bacteria') (options = 'Bacteria', 'Viruses', 'Archaea', 'Eukaryota')
+--organism  Filter organisms that are not the one provided (default= 'Bacteria') (options = 'Bacteria', 'Viruses', 'Archaea', 'Fungi')
 
 --files list of kraken2 mpa files (Must be with '.txt' extension)
 
