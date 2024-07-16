@@ -12,7 +12,7 @@ output: microanalyst_otu_table.txt and microanalyst_tax_table.txt
 
 How to use
 
-python kraken2micro.py --rank 'S' --organism 'Bacteria' --files file1_mpa.txt file2_mpa.txt file2_mpa.txt
+python kraken2micro.py --rank 'S' --organism 'Bacteria' --files MP1_A_mpa.txt MP1_B_mpa.txt	MP1_C_mpa.txt MP2_A_mpa.txt MP2_B_mpa.txt MP2_C_mpa.txt	MP3_A_mpa.txt MP3_B_mpa.txt MP3_C_mpa.txt MP4_A_mpa.txt MP4_B_mpa.txt MP4_C_mpa.txt MP5_A_mpa.txt MP5_B_mpa.txt MP5_C_mpa.txt
 """
 
 
@@ -23,7 +23,7 @@ def parseMPA(file_mpa):
 
 def make_otu_list(df, rank):
 
-    tax_dic = {'K': 'd__', 'P': 'p__', 'C': 'c__', 'O': 'o__', 'F': 'f__', 'G': 'g__', 'S': 's__'}
+    tax_dic = {'D': 'd__','K':'k__','P': 'p__', 'C': 'c__', 'O': 'o__', 'F': 'f__', 'G': 'g__', 'S': 's__'}
     
     lines = []
     index=0
@@ -74,13 +74,14 @@ def make_tax_table(otu_table, rank):
     
     table = []
     rank_lists = {
-        'S': ["d__", "p__", "c__", "o__", "f__", "g__", "s__"],
-        'G': ["d__", "p__", "c__", "o__", "f__", "g__"],
-        'F': ["d__", "p__", "c__", "o__", "f__"],
-        'O': ["d__", "p__", "c__", "o__"],
-        'C': ["d__", "p__", "c__"],
-        'P': ["d__", "p__"],
-        'K': ["d__"]
+        'S': ["d__", "k__","p__", "c__", "o__", "f__", "g__", "s__"],
+        'G': ["d__", "k__","p__", "c__", "o__", "f__", "g__"],
+        'F': ["d__", "k__","p__", "c__", "o__", "f__"],
+        'O': ["d__", "k__","p__", "c__", "o__"],
+        'C': ["d__", "k__","p__", "c__"],
+        'P': ["d__", "k__","p__"],
+        'K': ["d__","k__",],
+        'D': ["d__"]
     }
     tax_rank = rank_lists[rank][:]
     
@@ -96,24 +97,26 @@ def make_tax_table(otu_table, rank):
 
     possible_dicts = {
         'S': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1], "Class": tax_final[2],
-              "Order": tax_final[3], "Family": tax_final[4], "Genus": tax_final[5],
-              "Species": tax_final[6]},
+              "Domain": tax_final[0], "Kingdom":tax_final[1],"Phylum": tax_final[2], "Class": tax_final[3],
+              "Order": tax_final[4], "Family": tax_final[5], "Genus": tax_final[6],
+              "Species": tax_final[7]},
         'G': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1], "Class": tax_final[2],
-              "Order": tax_final[3], "Family": tax_final[4], "Genus": tax_final[5]},
+              "Domain": tax_final[0], "Kingdom":tax_final[1],"Phylum": tax_final[2], "Class": tax_final[3],
+              "Order": tax_final[4], "Family": tax_final[5], "Genus": tax_final[6]},
         'F': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1], "Class": tax_final[2],
-              "Order": tax_final[3], "Family": tax_final[4]},
+              "Domain": tax_final[0], "Kingdom":tax_final[1], "Phylum": tax_final[2], "Class": tax_final[3],
+              "Order": tax_final[4], "Family": tax_final[5]},
         'O': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1], "Class": tax_final[2],
-              "Order": tax_final[3]},
+              "Domain": tax_final[0], "Kingdom":tax_final[1], "Phylum": tax_final[2], "Class": tax_final[3],
+              "Order": tax_final[4]},
         'C': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1], "Class": tax_final[2]},
+              "Domain": tax_final[0], "Kingdom":tax_final[1], "Phylum": tax_final[2], "Class": tax_final[3]},
         'P': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0], "Phylum": tax_final[1]},
+              "Domain": tax_final[4], "Phylum": tax_final[5]},
         'K': {'#TAXONOMY': [rank[-1] for rank in otu_list],
-              "Kingdom": tax_final[0]}
+              "Domain": tax_final[0], "Kingdom":tax_final[1]},
+        'D': {'#TAXONOMY': [rank[-1] for rank in otu_list],
+              "Domain": tax_final[0]}
     }
 
     tax_table = pd.DataFrame.from_dict(possible_dicts[rank])
@@ -121,10 +124,15 @@ def make_tax_table(otu_table, rank):
     return tax_table
 
 def selectTaxa(otu_table, tax_table, org='Bacteria'):
-    organisms = {'Bacteria':'d__Bacteria', 'Viruses':'d__Viruses','Archaea':'d__Archaea','Eukaryota':'d__Eukaryota'}
+    organisms = {'Bacteria':'d__Bacteria', 'Viruses':'d__Viruses','Archaea':'d__Archaea','Eukaryota':'d__Eukaryota','Fungi':'k__Fungi'}
     otu_table = trimotutable(otu_table)
 
-    tax_table = tax_table[tax_table['Kingdom'] == organisms[org]]
+    
+    if org=='Fungi':
+        tax_table = tax_table[tax_table['Kingdom'] == organisms[org]]
+    else:
+        tax_table = tax_table[tax_table['Domain'] == organisms[org]]
+
     otu_table = otu_table[otu_table['#NAME'].isin(tax_table['#TAXONOMY'])]
 
     return otu_table, tax_table
@@ -133,16 +141,22 @@ def selectTaxa(otu_table, tax_table, org='Bacteria'):
 def main():
     parser = argparse.ArgumentParser(description="Process Kraken reports and generate OTU and taxonomy tables.")
     parser.add_argument('--rank', type=str, choices=['S', 'G', 'F', 'O', 'C', 'P', 'K'], required=True, help='Taxonomic rank to use.')
-    parser.add_argument('--organism', type=str, choices=['Bacteria', 'Viruses', 'Archaea', 'Eukaryota'], required=True, help='Organism to filter.')
+    parser.add_argument('--organism', type=str, choices=['Bacteria', 'Viruses', 'Archaea', 'Fungi'], required=True, help='Organism to filter.')
     parser.add_argument('--files', type=str, nargs='+', required=True, help='List of Kraken report files to parse.')
 
     args = parser.parse_args()
 
     otu_table = make_otu_table(args.files, args.rank)
-    
     tax_table = make_tax_table(otu_table, args.rank)
-
     otu_table, tax_table = selectTaxa(otu_table, tax_table, org=args.organism)
+
+    if args.organism == 'Bacteria':
+        tax_table = tax_table.drop(columns='Kingdom')
+        tax_table = tax_table.rename(columns={'Domain': 'Kingdom'})
+        
+    if args.organism == 'Fungi':
+        tax_table = tax_table.drop(columns='Domain')
+    
 
     otu_table.to_csv('microanalyst_otu_table.txt', sep='\t',index=False)
     tax_table.to_csv('microanalyst_taxonomy_table.txt', sep='\t',index=False)
@@ -150,8 +164,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
 
 
