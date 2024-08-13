@@ -150,7 +150,7 @@ def main():
     tax_table = make_tax_table(otu_table, args.rank)
     otu_table, tax_table = selectTaxa(otu_table, tax_table, org=args.organism)
 
-    if args.organism == 'Bacteria':
+    if args.organism != 'Fungi':
         tax_table = tax_table.drop(columns='Kingdom')
         tax_table = tax_table.rename(columns={'Domain': 'Kingdom'})
         
