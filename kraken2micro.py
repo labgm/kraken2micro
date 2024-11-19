@@ -19,6 +19,11 @@ python kraken2micro.py --rank 'S' --organism 'Bacteria' --files MP1_A_mpa.txt MP
 def parseMPA(file_mpa):
     columns=['taxonomy','reads']
     df = pd.read_csv(file_mpa,sep='\t',header=None,names=columns)
+    df = df.set_index('taxonomy')
+    df.index = df.index.str.replace('k__Bacteria', 'd__Bacteria')
+    df.index = df.index.str.replace('k__Archaea', 'd__Archaea')
+    df.index = df.index.str.replace('k__Viruses', 'd__Viruses')
+    df = df.reset_index()
     return df
 
 def make_otu_list(df, rank):
