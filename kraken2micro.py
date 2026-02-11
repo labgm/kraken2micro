@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+import os
 
 """
 autor: TMDavi
@@ -49,7 +50,10 @@ def parse_otu_taxonomy(otu_table):
         lines.append(l)
     return lines
 
-def make_otu_table(kraken_reports, rank):
+def make_otu_table(kraken_reports_dir, rank):
+
+    kraken_reports = [entry.path for entry in os.scandir(str(kraken_reports_dir)) if entry.is_file()]
+
     otu_table = pd.DataFrame()
     temp_table = pd.DataFrame()
     for report in kraken_reports:
@@ -58,7 +62,7 @@ def make_otu_table(kraken_reports, rank):
 
         temp_table = pd.DataFrame({
             '#NAME':[';'.join(rank[0]) for rank in otu_list],
-            f"{report.replace('.txt','')}":[rank[1] for rank in otu_list]
+            f"{report.split('/')[-1]}":[rank[1] for rank in otu_list]
         })
         if otu_table.empty:
             otu_table = temp_table
@@ -147,11 +151,16 @@ def main():
     parser = argparse.ArgumentParser(description="Process Kraken reports and generate OTU and taxonomy tables.")
     parser.add_argument('--rank', type=str, choices=['S', 'G', 'F', 'O', 'C', 'P', 'K'], required=True, help='Taxonomic rank to use.')
     parser.add_argument('--organism', type=str, choices=['Bacteria', 'Viruses', 'Archaea', 'Fungi'], required=True, help='Organism to filter.')
-    parser.add_argument('--files', type=str, nargs='+', required=True, help='List of Kraken report files to parse.')
+    parser.add_argument('--files_dir', type=str, required=True, help='List of Kraken report files to parse (mpa format).')
+    parser.add_argument('--output_dir', type=str, required=True, help='Path to the output files')
+
 
     args = parser.parse_args()
 
-    otu_table = make_otu_table(args.files, args.rank)
+    if not os.path.exists(f'{args.output_dir}'):
+        os.makedirs(f'{args.output_dir}')
+
+    otu_table = make_otu_table(args.files_dir, args.rank)
     tax_table = make_tax_table(otu_table, args.rank)
     otu_table, tax_table = selectTaxa(otu_table, tax_table, org=args.organism)
 
@@ -163,8 +172,8 @@ def main():
         tax_table = tax_table.drop(columns='Domain')
     
 
-    otu_table.to_csv('microanalyst_otu_table.txt', sep='\t',index=False)
-    tax_table.to_csv('microanalyst_taxonomy_table.txt', sep='\t',index=False)
+    otu_table.to_csv(f'{args.output_dir}/microanalyst_otu_table.txt', sep='\t',index=False)
+    tax_table.to_csv(f'{args.output_dir}/microanalyst_taxonomy_table.txt', sep='\t',index=False)
 
 
 if __name__ == "__main__":
